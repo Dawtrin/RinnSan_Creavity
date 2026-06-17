@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Firestore Inspect & Restore Tool</title>
+  <style>
+    body { font-family: monospace; background: #111; color: #eee; padding: 20px; }
+    h1 { color: #C0FF00; }
+    .item-card { border: 1px solid #333; padding: 10px; margin-bottom: 10px; border-radius: 4px; display: flex; align-items: center; gap: 15px; }
+    .item-img { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #444; }
+    .btn { background: #FF0040; color: white; border: none; padding: 6px 12px; cursor: pointer; border-radius: 4px; }
+    .btn:hover { background: red; }
+    .btn-restore { background: #C0FF00; color: black; font-weight: bold; }
+    .btn-restore:hover { background: #adff00; }
+  </style>
+</head>
+<body>
+  <h1>Firestore Inspect & Restore Tool</h1>
+  <div style="margin-bottom: 20px; display: flex; gap: 10px;">
+    <button class="btn btn-restore" id="load-btn">LOAD ALL PRODUCTS</button>
+    <button class="btn" id="delete-seeded-btn" style="display:none;">DELETE ALL SEEDED PRODUCTS</button>
+  </div>
+  <div id="status">// Ready</div>
+  <div id="list"></div>
+
+  <script type="module">
+    import { db } from "./js/firebase-config.js?v=3";
+    import { collection, getDocs, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    let allItems = [];
+
+    async function loadAll() {
+      const status = document.getElementById("status");
+      status.textContent = "// Loading products...";
+      const listEl = document.getElementById("list");
+      listEl.innerHTML = "";
+      try {
+        const snap = await getDocs(collection(db, "artifacts"));
+        allItems = snap.docs.map(d => ({ docId: d.id, ...d.data() }));
+        status.textContent = `// Loaded ${allItems.length} products.`;
+
+        // Check if any are seeded. Seeded items usually have images from Unsplash containing "images.unsplash.com" and a "sig=" parameter.
+        const seeded = allItems.filter(isSeeded);
+        const deleteBtn = document.getElementById("delete-seeded-btn");
+        if (seeded.length > 0) {
+          deleteBtn.style.display = "inline-block";
+          deleteBtn.textContent = `DELETE ALL SEEDED PRODUCTS (${seeded.length})`;
+        } else {
+          deleteBtn.style.display = "none";
+        }
+
+        listEl.innerHTML = allItems.map(item => {
+          const seededLabel = isSeeded(item) ? "<span style='color:#FF0040; font-weight:bold;'>[SEEDED]</span>" : "<span style='color:#00FF88;'>[CUSTOM/ORIGINAL]</span>";
+          return `
+            <div class="item-card" id="card-${item.docId}">
+              <img class="item-img" src="${item.imageUrl || ''}" onerror="this.style.display='none'">
+              <div style="flex:1">
+                <div><strong>${item.title || 'UNTITLED'}</strong> (${item.vendor || 'NO VENDOR'}) - ${item.price || '0₫'}</div>
+                <div style="font-size:11px; color:#aaa; margin-top:4px;">ID: ${item.id || ''} | Doc ID: ${item.docId} | ${seededLabel}</div>
+                <div style="font-size:11px; color:#888; word-break:break-all;">Image URL: ${item.imageUrl || ''}</div>
+              </div>
+              <button class="btn" onclick="window._deleteSingle('${item.docId}')">DELETE</button>
+            </div>
+          `;
+        }).join("");
+      } catch (e) {
+        status.textContent = `// Error loading: ${e.message}`;
+      }
+    }
+
+    function isSeeded(item) {
+      // Seeded items in generateSeed use BRAND_IMGS urls which are:
+      // - https://images.unsplash.com/photo-1542291026-7eec264c27ff...
+      // - https://images.unsplash.com/photo-1608231387042-66d1773070a5...
+      // - https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa...
+      // - https://images.unsplash.com/photo-1548036328-c9fa89d128fa...
+      // - https://images.unsplash.com/photo-1489987707025-afc232f7ea0f...
+      // Let's check if the imageUrl contains "images.unsplash.com/photo-" or "sig="
+      const url = item.imageUrl || "";
+      return url.includes("images.unsplash.com") && url.includes("sig=");
+    }
+
+    window._deleteSingle = async (docId) => {
+      const card = document.getElementById(`card-${docId}`);
+      card.style.opacity = "0.5";
+      try {
+        await deleteDoc(doc(db, "artifacts", docId));
+        card.remove();
+        document.getElementById("status").textContent = `// Deleted document ${docId}`;
+      } catch (e) {
+        card.style.opacity = "1";
+        alert(`Delete error: ${e.message}`);
+      }
+    };
+
+    document.getElementById("load-btn").addEventListener("click", loadAll);
+
+    document.getElementById("delete-seeded-btn").addEventListener("click", async () => {
+      const seeded = allItems.filter(isSeeded);
+      if (!confirm(`Are you sure you want to delete all ${seeded.length} seeded products? This will leave your custom products intact.`)) return;
+
+      const status = document.getElementById("status");
+      status.textContent = `// Deleting ${seeded.length} seeded products...`;
+      let count = 0;
+      for (const item of seeded) {
+        try {
+          await deleteDoc(doc(db, "artifacts", item.docId));
+          count++;
+          status.textContent = `// Deleted ${count}/${seeded.length} seeded products.`;
+        } catch (e) {
+          console.error("Failed to delete", item.docId, e);
+        }
+      }
+      status.textContent = `// Finished deleting. Deleted ${count} seeded products.`;
+      loadAll();
+    });
+  </script>
+</body>
+</html>

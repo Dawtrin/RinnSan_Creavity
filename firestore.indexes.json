@@ -1,0 +1,30 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "artifacts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "vendor", "order": "ASCENDING" },
+        { "fieldPath": "archetype", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "artifacts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "vendor", "order": "ASCENDING" },
+        { "fieldPath": "archetype", "order": "ASCENDING" },
+        { "fieldPath": "category", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "artifacts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "archetype", "order": "ASCENDING" },
+        { "fieldPath": "category", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

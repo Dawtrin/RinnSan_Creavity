@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RinnSan Creavity — Command Center</title>
+  <meta name="description" content="Admin Command Center — RinnSan Creavity"/>
+  <link rel="stylesheet" href="css/style.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="toast-box" id="toast-box"></div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="loading-title">LOADING<br>DATA...</div>
+  <div class="loading-sub">// INITIALIZING COMMAND CENTER</div>
+  <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+</div>
+
+<!-- Keyboard Shortcuts Overlay -->
+<div class="shortcuts-overlay" id="shortcuts-overlay">
+  <div class="shortcuts-card">
+    <div class="shortcuts-title">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--acid)" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.001M10 8h.001M14 8h.001M18 8h.001M8 12h.001M12 12h.001M16 12h.001M8 16h8"/></svg>
+      KEYBOARD SHORTCUTS
+    </div>
+    <div class="shortcut-row"><span class="shortcut-desc">Overview</span><div class="shortcut-keys"><span class="shortcut-key">Ctrl</span><span class="shortcut-key">1</span></div></div>
+    <div class="shortcut-row"><span class="shortcut-desc">Inventory</span><div class="shortcut-keys"><span class="shortcut-key">Ctrl</span><span class="shortcut-key">2</span></div></div>
+    <div class="shortcut-row"><span class="shortcut-desc">Orders</span><div class="shortcut-keys"><span class="shortcut-key">Ctrl</span><span class="shortcut-key">3</span></div></div>
+    <div class="shortcut-row"><span class="shortcut-desc">Brands</span><div class="shortcut-keys"><span class="shortcut-key">Ctrl</span><span class="shortcut-key">4</span></div></div>
+    <div class="shortcut-row"><span class="shortcut-desc">Users</span><div class="shortcut-keys"><span class="shortcut-key">Ctrl</span><span class="shortcut-key">5</span></div></div>
+    <div class="shortcut-row"><span class="shortcut-desc">Support</span><div class="shortcut-keys"><span class="shortcut-key">Ctrl</span><span class="shortcut-key">6</span></div></div>
+    <div class="shortcut-row"><span class="shortcut-desc">Add Artifact</span><div class="shortcut-keys"><span class="shortcut-key">Ctrl</span><span class="shortcut-key">N</span></div></div>
+    <div class="shortcut-row"><span class="shortcut-desc">Refresh</span><div class="shortcut-keys"><span class="shortcut-key">Ctrl</span><span class="shortcut-key">R</span></div></div>
+    <div class="shortcut-row"><span class="shortcut-desc">Close Modal</span><div class="shortcut-keys"><span class="shortcut-key">Esc</span></div></div>
+    <div class="shortcut-row"><span class="shortcut-desc">Show Shortcuts</span><div class="shortcut-keys"><span class="shortcut-key">Ctrl</span><span class="shortcut-key">/</span></div></div>
+    <div style="text-align:center;margin-top:14px">
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('shortcuts-overlay').classList.remove('show')">CLOSE</button>
+    </div>
+  </div>
+</div>
+
+<div class="layout" id="dashboard-root">
+
+<!-- Mobile Sidebar Backdrop -->
+<div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-top">
+    <div class="sb-brand">
+      <div class="sb-logo">RC</div>
+      <div>
+        <div class="sb-brand-name">RinnSan</div>
+        <div class="sb-brand-sub">// ADMIN</div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="sb-nav">
+    <div class="nav-section-lbl">NAVIGATION</div>
+
+    <!-- OVERVIEW -->
+    <button class="nav-btn active" data-tab="overview" id="nav-overview">
+      <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+      </svg>
+      Overview
+    </button>
+
+    <!-- INVENTORY -->
+    <button class="nav-btn" data-tab="inventory" id="nav-inventory">
+      <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+        <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
+      </svg>
+      Inventory
+      <span class="nav-pill" id="pill-inventory"></span>
+    </button>
+
+    <!-- ORDERS -->
+    <button class="nav-btn" data-tab="orders" id="nav-orders">
+      <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/>
+        <path d="M16 10a4 4 0 0 1-8 0"/>
+      </svg>
+      Orders
+      <span class="nav-pill" id="pill-orders"></span>
+    </button>
+
+    <!-- BRANDS -->
+    <button class="nav-btn" data-tab="brands" id="nav-brands">
+      <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+      </svg>
+      Brands
+    </button>
+
+    <!-- USERS -->
+    <button class="nav-btn" data-tab="users" id="nav-users">
+      <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      Users
+    </button>
+
+    <!-- SUPPORT -->
+    <button class="nav-btn" data-tab="support" id="nav-support">
+      <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+      Support
+      <span class="nav-pill" id="pill-support"></span>
+    </button>
+  </nav>
+
+  <div class="sb-foot">
+    <div class="sb-user">
+      <div class="sb-avatar" id="sb-avatar">A</div>
+      <div>
+        <div class="sb-user-email" id="sb-email">loading...</div>
+        <div class="sb-user-role">// ADMIN</div>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="window.authLogout()">LOGOUT</button>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+  <header class="top-hdr">
+    <!-- Hamburger (mobile) -->
+    <button class="hamburger" id="hamburger-btn">
+      <span></span><span></span><span></span>
+    </button>
+
+    <div class="hdr-left">
+      <div class="hdr-title" id="hdr-title">OVERVIEW</div>
+      <div class="hdr-sub" id="hdr-sub">// DASHBOARD COMMAND CENTER</div>
+    </div>
+
+    <div class="hdr-actions">
+      <div class="live-ind">
+        <div class="live-dot"></div>
+        <div class="live-txt">LIVE</div>
+      </div>
+
+      <!-- Notification Bell -->
+      <div style="position:relative" id="notif-wrap">
+        <button class="ico-btn" id="notif-btn" title="Notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="notif-badge" id="notif-count" style="display:none">0</span>
+        </button>
+        <div class="notif-panel" id="notif-panel">
+          <div class="notif-hdr">
+            <span class="notif-hdr-title">NOTIFICATIONS</span>
+            <button class="btn btn-ghost btn-xs" id="notif-clear-btn">CLEAR ALL</button>
+          </div>
+          <div class="notif-list" id="notif-list">
+            <div class="notif-empty">// NO NOTIFICATIONS</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Theme Picker -->
+      <div style="position:relative" id="theme-wrap">
+        <button class="ico-btn" id="theme-btn" title="Theme">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+        <div class="theme-panel" id="theme-panel">
+          <button class="theme-option active" data-theme="">
+            <div class="theme-dot" style="background:#C0FF00"></div>
+            <span class="theme-lbl">ACID NEON</span>
+          </button>
+          <button class="theme-option" data-theme="cyber-blue">
+            <div class="theme-dot" style="background:#00BFFF"></div>
+            <span class="theme-lbl">CYBER BLUE</span>
+          </button>
+          <button class="theme-option" data-theme="crimson">
+            <div class="theme-dot" style="background:#FF003C"></div>
+            <span class="theme-lbl">CRIMSON</span>
+          </button>
+          <button class="theme-option" data-theme="neon-purple">
+            <div class="theme-dot" style="background:#BF00FF"></div>
+            <span class="theme-lbl">NEON PURPLE</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Refresh -->
+      <button class="ico-btn" id="refresh-btn" title="Refresh">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.49"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── OVERVIEW ── -->
+  <div class="tab-pane active" id="tab-overview">
+    <!-- Revenue Banner -->
+    <div class="rev-banner">
+      <div class="rev-tag">TOTAL GROSS REVENUE</div>
+      <div class="rev-total" id="kpi-gross">—</div>
+      <div class="rev-row">
+        <div class="rev-item">
+          <div class="lbl">DIRECT SALE</div>
+          <div class="val" id="kpi-revenue" style="color:var(--green)">—</div>
+        </div>
+        <div class="rev-divider"></div>
+        <div class="rev-item">
+          <div class="lbl">AFFILIATE</div>
+          <div class="val" id="kpi-commission" style="color:var(--acid)">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI Row 1 -->
+    <div class="kpi-grid">
+      <div class="kpi-card" data-color="white">
+        <div class="kpi-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <div class="kpi-val skel" id="kpi-users" style="min-width:50px;min-height:30px">&nbsp;</div>
+        <div class="kpi-lbl">Users</div>
+      </div>
+      <div class="kpi-card" data-color="acid">
+        <div class="kpi-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
+        <div class="kpi-val skel" id="kpi-artifacts" style="min-width:50px;min-height:30px">&nbsp;</div>
+        <div class="kpi-lbl">Artifacts</div>
+      </div>
+      <div class="kpi-card" data-color="red">
+        <div class="kpi-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <div class="kpi-val skel" id="kpi-tickets" style="min-width:40px;min-height:30px">&nbsp;</div>
+        <div class="kpi-lbl">Open Tickets</div>
+      </div>
+      <div class="kpi-card" data-color="orange">
+        <div class="kpi-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
+        <div class="kpi-val skel" id="kpi-orders" style="min-width:40px;min-height:30px">&nbsp;</div>
+        <div class="kpi-lbl">Orders</div>
+      </div>
+      <div class="kpi-card" data-color="orange">
+        <div class="kpi-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="kpi-val skel" id="kpi-pending" style="min-width:40px;min-height:30px">&nbsp;</div>
+        <div class="kpi-lbl">Pending</div>
+      </div>
+      <div class="kpi-card" data-color="green">
+        <div class="kpi-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="kpi-val skel" id="kpi-delivered" style="min-width:40px;min-height:30px">&nbsp;</div>
+        <div class="kpi-lbl">Delivered</div>
+      </div>
+      <div class="kpi-card" data-color="acid">
+        <div class="kpi-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg></div>
+        <div class="kpi-val skel" id="kpi-clicks" style="min-width:40px;min-height:30px">&nbsp;</div>
+        <div class="kpi-lbl">Total Clicks</div>
+      </div>
+      <div class="kpi-card" data-color="blue">
+        <div class="kpi-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+        <div class="kpi-val skel" id="kpi-paid" style="min-width:40px;min-height:30px">&nbsp;</div>
+        <div class="kpi-lbl">Paid Orders</div>
+      </div>
+    </div>
+
+    <!-- Charts row 1 -->
+    <div class="chart-grid-3">
+      <div class="chart-card">
+        <div class="chart-hdr"><span class="chart-title">COMMISSION / 14 DAYS</span><span class="chart-tag">AFFILIATE</span></div>
+        <canvas id="chart-commission" height="110"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-hdr"><span class="chart-title">BRAND SHARE</span><span class="chart-tag">CLICKS</span></div>
+        <canvas id="chart-brand-share" height="110"></canvas>
+      </div>
+    </div>
+
+    <!-- Charts row 2 -->
+    <div class="chart-grid-2">
+      <div class="chart-card">
+        <div class="chart-hdr"><span class="chart-title">REVENUE / 14 DAYS</span><span class="chart-tag">DIRECT ₫</span></div>
+        <canvas id="chart-revenue" height="120"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-hdr"><span class="chart-title">ORDER STATUS</span><span class="chart-tag">ALL TIME</span></div>
+        <canvas id="chart-order-status" height="120"></canvas>
+      </div>
+    </div>
+
+    <!-- Live Feed & Top Sellers Grid -->
+    <div class="chart-grid-3">
+      <!-- Live Feed -->
+      <div class="tbl-wrap" style="margin-bottom:0">
+        <div class="tbl-hdr">
+          <div class="tbl-title">LIVE FEED</div>
+          <div class="feed-toggle">
+            <button class="feed-tab active" id="ft-orders">ORDERS</button>
+            <button class="feed-tab" id="ft-clicks">CLICKS</button>
+          </div>
+        </div>
+        <div style="padding:14px 18px">
+          <div class="activity-list" id="feed-orders"></div>
+          <div class="activity-list" id="feed-clicks" style="display:none"></div>
+        </div>
+      </div>
+
+      <!-- Top Selling Products -->
+      <div class="tbl-wrap" style="margin-bottom:0; display:flex; flex-direction:column">
+        <div class="tbl-hdr">
+          <div class="tbl-title">TOP ARTIFACTS</div>
+          <span style="font-family:'Space Mono',monospace;font-size:8px;color:var(--acid);">// BEST SELLERS</span>
+        </div>
+        <div style="padding:14px 18px; flex:1; display:flex; flex-direction:column; gap:8px" id="top-sellers-list">
+          <div class="notif-empty">// NO DATA YET</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── INVENTORY ── -->
+  <div class="tab-pane" id="tab-inventory">
+    <div class="sec-hdr">
+      <div>
+        <div class="sec-title">INVENTORY <span>// VAULT</span></div>
+        <div class="sec-meta" id="inv-meta">Loading...</div>
+      </div>
+      <button class="btn btn-acid" id="add-art-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        ADD ARTIFACT
+      </button>
+    </div>
+    <div class="sec-divider"></div>
+
+    <!-- Sub-tabs: AFFILIATE | DIRECT SALE -->
+    <div class="inv-subtabs">
+      <button class="inv-subtab active-aff" id="subtab-aff" data-sub="aff">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        AFFILIATE
+        <span class="inv-subtab-count" id="cnt-aff">0</span>
+      </button>
+      <button class="inv-subtab" id="subtab-dir" data-sub="dir">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        DIRECT SALE
+        <span class="inv-subtab-count" id="cnt-dir">0</span>
+      </button>
+    </div>
+
+    <!-- Sub-tab desc -->
+    <div id="inv-sub-desc" style="font-family:'Space Mono',monospace;font-size:9px;color:var(--silver);margin-bottom:14px;letter-spacing:.5px">
+      Sản phẩm dẫn link ngoài · Commission rate · Click tracking
+    </div>
+
+    <!-- Affiliate Stats / Direct Stats -->
+    <div id="inv-stats-bar" class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:18px"></div>
+
+    <!-- DIRECT SALE: RESEED btn -->
+    <div id="inv-reseed-wrap" style="display:none;margin-bottom:14px">
+      <button class="btn btn-orange" id="reseed-btn" style="width:100%;justify-content:center">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.49"/></svg>
+        RESEED RINNSAN — UPDATE SIZESTOCK
+      </button>
+    </div>
+
+    <!-- Seeders (affiliate only) -->
+    <div id="inv-seeders-wrap">
+      <div class="tbl-wrap" style="margin-bottom:14px">
+        <div class="tbl-hdr">
+          <div class="tbl-title">DATA SEEDERS</div>
+          <span style="font-family:'Space Mono',monospace;font-size:8px;color:var(--silver);">// INJECT MOCK DATA</span>
+        </div>
+        <div class="seeder-grid" style="padding:14px">
+          <div class="seeder-card" id="seed-nike">
+            <div class="seeder-ico" style="background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.15)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--acid)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <div class="seeder-name">Nike</div>
+            <div class="seeder-cnt">20 PRODUCTS</div>
+          </div>
+          <div class="seeder-card" id="seed-puma">
+            <div class="seeder-ico" style="background:rgba(255,140,0,.08);border:1px solid rgba(255,140,0,.2)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </div>
+            <div class="seeder-name">Puma</div>
+            <div class="seeder-cnt">10 PRODUCTS</div>
+          </div>
+          <div class="seeder-card" id="seed-balenciaga">
+            <div class="seeder-ico" style="background:rgba(191,0,255,.08);border:1px solid rgba(191,0,255,.2)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div class="seeder-name">Balenciaga</div>
+            <div class="seeder-cnt">9 PRODUCTS</div>
+          </div>
+          <div class="seeder-card" id="seed-rick">
+            <div class="seeder-ico" style="background:rgba(255,0,64,.08);border:1px solid rgba(255,0,64,.2)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </div>
+            <div class="seeder-name">Rick Owens</div>
+            <div class="seeder-cnt">9 PRODUCTS</div>
+          </div>
+          <div class="seeder-card" id="seed-rinnsan">
+            <div class="seeder-ico" style="background:rgba(192,255,0,.08);border:1px solid rgba(192,255,0,.2)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--acid)" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </div>
+            <div class="seeder-name">RinnSan</div>
+            <div class="seeder-cnt">RESEED</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cmd" id="inv-console"></div>
+
+    <div class="inv-controls">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="inv-search" placeholder="Search artifacts..."/>
+      </div>
+      <select class="form-ctrl" id="inv-filter-vendor" style="width:auto;min-width:120px;">
+        <option value="">ALL BRANDS</option>
+      </select>
+      <select class="form-ctrl" id="inv-view" style="width:auto;">
+        <option value="grid">GRID VIEW</option>
+        <option value="table">TABLE VIEW</option>
+      </select>
+    </div>
+
+    <div class="art-grid" id="art-grid"></div>
+    <div class="tbl-wrap" id="art-tbl-wrap" style="display:none">
+      <table class="data-tbl">
+        <thead><tr><th>PRODUCT</th><th>VENDOR</th><th>ARCHETYPE</th><th>PRICE</th><th>STOCK</th><th>TYPE</th><th>ACTIONS</th></tr></thead>
+        <tbody id="art-tbody"></tbody>
+      </table>
+    </div>
+    <div class="pages" id="inv-pages"></div>
+  </div>
+
+  <!-- ── ORDERS ── -->
+  <div class="tab-pane" id="tab-orders">
+    <div class="sec-hdr">
+      <div><div class="sec-title">ORDERS <span>// MANAGEMENT</span></div><div class="sec-meta" id="orders-meta">Loading...</div></div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" id="export-csv-btn">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          EXPORT CSV
+        </button>
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="orders-search" placeholder="Search ID / User..."/>
+        </div>
+        <select class="form-ctrl" id="orders-filter" style="width:auto;min-width:150px">
+          <option value="">ALL STATUS</option>
+          <option value="pending">PENDING</option>
+          <option value="paid">PAID</option>
+          <option value="delivered">DELIVERED</option>
+          <option value="cancelled">CANCELLED</option>
+        </select>
+      </div>
+    </div>
+    <div class="sec-divider"></div>
+    <div class="tbl-wrap">
+      <table class="data-tbl"><thead><tr>
+        <th>ORDER ID</th><th>USER</th><th>AMOUNT</th><th>PAYMENT</th><th>STATUS</th><th>DATE</th><th>ACTIONS</th>
+      </tr></thead>
+      <tbody id="orders-tbody"></tbody></table>
+    </div>
+    <div class="pages" id="orders-pages"></div>
+  </div>
+
+  <!-- ── BRANDS ── -->
+  <div class="tab-pane" id="tab-brands">
+    <div class="sec-hdr"><div><div class="sec-title">BRANDS <span>// COMMISSION</span></div><div class="sec-meta">Affiliate commission rates per brand</div></div></div>
+    <div class="sec-divider"></div>
+    <div class="cmd" id="brands-console"></div>
+    <div id="brands-list" style="display:flex;flex-direction:column;gap:12px"></div>
+  </div>
+
+  <!-- ── USERS ── -->
+  <div class="tab-pane" id="tab-users">
+    <div class="sec-hdr">
+      <div><div class="sec-title">USERS <span>// REGISTRY</span></div><div class="sec-meta" id="users-meta">Loading...</div></div>
+    </div>
+    <div class="sec-divider"></div>
+
+    <!-- Stat cards -->
+    <div class="kpi-grid" id="user-stats-grid" style="grid-template-columns:repeat(3,1fr);max-width:500px;margin-bottom:18px"></div>
+
+    <!-- Archetype dist bar -->
+    <div class="tbl-wrap" style="margin-bottom:16px">
+      <div class="tbl-hdr"><div class="tbl-title">IDENTITY DISTRIBUTION</div></div>
+      <div style="padding:14px 18px">
+        <div style="height:6px;border-radius:4px;overflow:hidden;display:flex;gap:1px;margin-bottom:10px" id="arch-bar"></div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap" id="arch-legend"></div>
+      </div>
+    </div>
+
+    <!-- Search + Filters -->
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="users-search" placeholder="Search email / uid..."/>
+      </div>
+      <div class="filter-chips">
+        <span class="filter-lbl">ROLE:</span>
+        <button class="chip on" data-group="role" data-val="ALL">ALL</button>
+        <button class="chip" data-group="role" data-val="admin">ADMIN</button>
+        <button class="chip" data-group="role" data-val="user">USER</button>
+      </div>
+      <div class="filter-chips">
+        <span class="filter-lbl">STATUS:</span>
+        <button class="chip on" data-group="status" data-val="ALL">ALL</button>
+        <button class="chip" data-group="status" data-val="active">ACTIVE</button>
+        <button class="chip" data-group="status" data-val="banned" style="--chip-col:var(--red)">BANNED</button>
+      </div>
+    </div>
+    <div id="users-list" style="display:flex;flex-direction:column;gap:7px"></div>
+    <div class="pages" id="users-pages"></div>
+  </div>
+
+  <!-- ── SUPPORT ── -->
+  <div class="tab-pane" id="tab-support">
+    <div class="sec-hdr">
+      <div><div class="sec-title">SUPPORT <span>// TICKETS</span></div><div class="sec-meta" id="support-meta">Loading...</div></div>
+      <div style="display:flex;gap:8px">
+        <select class="form-ctrl" id="support-filter" style="width:auto;min-width:140px">
+          <option value="">ALL TICKETS</option>
+          <option value="new">OPEN / NEW</option>
+          <option value="resolved">RESOLVED</option>
+        </select>
+      </div>
+    </div>
+    <div class="sec-divider"></div>
+    <div class="cmd" id="support-console"></div>
+    <div id="tickets-list"></div>
+    <div class="pages" id="support-pages"></div>
+  </div>
+
+</div><!-- /main -->
+</div><!-- /layout -->
+
+<!-- Quick Actions Bar -->
+<div class="quick-actions" id="quick-actions">
+  <button class="qa-btn" id="qa-add" title="Add Artifact">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    <span class="qa-tooltip">ADD ARTIFACT</span>
+  </button>
+  <button class="qa-btn" id="qa-orders" title="Orders">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
+    <span class="qa-tooltip">ORDERS</span>
+  </button>
+  <div class="qa-divider"></div>
+  <button class="qa-btn" id="qa-support" title="Support">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <span class="qa-tooltip">SUPPORT</span>
+  </button>
+  <button class="qa-btn" id="qa-shortcuts" title="Shortcuts">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.001M10 8h.001M14 8h.001M18 8h.001M8 12h.001M12 12h.001M16 12h.001M8 16h8"/></svg>
+    <span class="qa-tooltip">SHORTCUTS</span>
+  </button>
+</div>
+
+<!-- ═══ MODALS ═══ -->
+
+<!-- Add/Edit Artifact -->
+<div class="overlay" id="modal-artifact">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title" id="art-modal-title">ADD ARTIFACT</div>
+      <button class="modal-x" data-close="modal-artifact">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:10px;margin-bottom:18px;border:1px solid rgba(255,255,255,.08);border-radius:6px;overflow:hidden">
+        <button class="btn" id="m-tab-aff" style="flex:1;border-radius:0;background:rgba(192,255,0,.07);color:var(--acid);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px" data-mtab="aff">AFFILIATE</button>
+        <button class="btn" id="m-tab-dir" style="flex:1;border-radius:0;background:none;color:var(--silver);font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1px" data-mtab="dir">DIRECT SALE</button>
+      </div>
+
+      <!-- Archetype chips -->
+      <div style="margin-bottom:14px">
+        <div class="form-lbl">ARCHETYPE</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap" id="arch-chips"></div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group"><label class="form-lbl">ARTIFACT ID</label><input class="form-ctrl" id="af-id" placeholder="GH-010"/></div>
+        <div class="form-group"><label class="form-lbl">TITLE</label><input class="form-ctrl" id="af-title" placeholder="Nike Air Max..."/></div>
+        <div class="form-group"><label class="form-lbl">VENDOR</label><input class="form-ctrl" id="af-vendor" placeholder="nike"/></div>
+        <div class="form-group"><label class="form-lbl">CATEGORY</label><input class="form-ctrl" id="af-cat" placeholder="Giày"/></div>
+        <div class="form-group"><label class="form-lbl">DISPLAY PRICE</label><input class="form-ctrl" id="af-price" placeholder="2,500,000 VND"/></div>
+        <div class="form-group"><label class="form-lbl">INTERNAL PRICE (₫)</label><input class="form-ctrl" type="number" id="af-int-price" placeholder="2500000"/></div>
+        <div id="af-comm-wrap" class="form-group"><label class="form-lbl">COMMISSION RATE (%)</label><input class="form-ctrl" type="number" step="0.01" id="af-comm" placeholder="8"/></div>
+        <div id="af-stock-wrap" class="form-group" style="display:none"><label class="form-lbl">TOTAL STOCK</label><input class="form-ctrl" type="number" id="af-stock" placeholder="0"/></div>
+      </div>
+
+      <div id="af-link-wrap" class="form-group"><label class="form-lbl">AFFILIATE LINK</label><input class="form-ctrl" id="af-link" placeholder="https://shopee.vn/..."/></div>
+
+      <!-- Sizes (direct only) -->
+      <div id="af-sizes-wrap" style="display:none;margin-bottom:14px">
+        <div class="form-lbl" style="margin-bottom:8px">AVAILABLE SIZES & STOCK</div>
+        <div id="af-sizes-grid" style="display:flex;flex-direction:column;gap:8px"></div>
+      </div>
+
+      <!-- Image upload -->
+      <div class="form-group">
+        <label class="form-lbl">PRODUCT IMAGE</label>
+        <div class="upload-zone" id="upload-zone">
+          <input type="file" id="af-img-file" accept="image/*"/>
+          <div class="upload-zone-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+          <div class="upload-hint">Drop image or <span>click to browse</span></div>
+          <div class="upload-preview-grid" id="upload-preview"></div>
+        </div>
+        <div style="margin-top:8px"><label class="form-lbl">OR PASTE URL</label><input class="form-ctrl" id="af-img-url" placeholder="https://res.cloudinary.com/..."/></div>
+        <div class="progress" id="upload-progress"><div class="progress-fill" id="upload-fill" style="width:0%"></div></div>
+      </div>
+
+      <div class="form-group"><label class="form-lbl">DESCRIPTION</label><textarea class="form-ctrl" id="af-desc" rows="3" placeholder="Product description..."></textarea></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" data-close="modal-artifact">CANCEL</button>
+      <button class="btn btn-acid" id="save-art-btn">SAVE ARTIFACT</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Stock / Direct Sale -->
+<div class="overlay" id="modal-edit-art">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-title">EDIT ARTIFACT</div><button class="modal-x" data-close="modal-edit-art">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-docid"/>
+      <input type="hidden" id="edit-type"/>
+      <div class="form-grid">
+        <div class="form-group"><label class="form-lbl">TITLE</label><input class="form-ctrl" id="edit-title" placeholder="Product Title..."/></div>
+        <div class="form-group"><label class="form-lbl">VENDOR</label><input class="form-ctrl" id="edit-vendor" placeholder="vendor"/></div>
+        <div class="form-group"><label class="form-lbl">CATEGORY</label><input class="form-ctrl" id="edit-cat" placeholder="Category..."/></div>
+        <div class="form-group"><label class="form-lbl">DISPLAY PRICE</label><input class="form-ctrl" id="edit-price"/></div>
+        <div class="form-group"><label class="form-lbl">INTERNAL PRICE (₫)</label><input class="form-ctrl" type="number" id="edit-int-price"/></div>
+        <div class="form-group" id="edit-comm-grp"><label class="form-lbl">COMMISSION RATE (%)</label><input class="form-ctrl" type="number" step="0.1" id="edit-comm"/></div>
+        <div class="form-group" id="edit-stock-grp"><label class="form-lbl">STOCK</label><input class="form-ctrl" type="number" id="edit-stock"/></div>
+      </div>
+      <!-- Image upload for edit -->
+      <div class="form-group">
+        <label class="form-lbl">PRODUCT IMAGE</label>
+        <div class="upload-zone" id="edit-upload-zone">
+          <input type="file" id="edit-img-file" accept="image/*"/>
+          <div class="upload-zone-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+          <div class="upload-hint">Drop image or <span>click to browse</span></div>
+          <div class="upload-preview-grid" id="edit-upload-preview"></div>
+        </div>
+        <div style="margin-top:8px"><label class="form-lbl">OR PASTE URL</label><input class="form-ctrl" id="edit-img-url" placeholder="https://..."/></div>
+        <div class="progress" id="edit-upload-progress"><div class="progress-fill" id="edit-upload-fill" style="width:0%"></div></div>
+      </div>
+      <div class="form-group"><label class="form-lbl">DESCRIPTION</label><textarea class="form-ctrl" id="edit-desc" rows="3" placeholder="Description..."></textarea></div>
+      <!-- Size stock for direct sale -->
+      <div id="edit-sizes-wrap" style="display:none">
+        <div class="form-lbl" style="margin-bottom:8px">STOCK BY SIZE</div>
+        <div id="edit-sizes-list"></div>
+        <div style="display:flex;justify-content:space-between;padding-top:8px;border-top:1px solid rgba(255,255,255,.05)">
+          <span class="td-mono">TOTAL</span><span id="edit-size-total" style="font-family:'Oswald',sans-serif;font-size:16px"></span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" data-close="modal-edit-art">CANCEL</button>
+      <button class="btn btn-acid" id="update-art-btn">UPDATE</button>
+    </div>
+  </div>
+</div>
+
+<!-- Order Detail -->
+<div class="overlay" id="modal-order">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-title">ORDER DETAIL</div><button class="modal-x" data-close="modal-order">✕</button></div>
+    <div class="modal-body" id="order-detail-body"></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost no-print" data-close="modal-order">CLOSE</button>
+      <button class="btn btn-ghost btn-sm no-print" id="print-invoice-btn">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        PRINT
+      </button>
+      <select class="form-ctrl no-print" id="order-status-sel" style="width:auto">
+        <option value="pending">PENDING</option><option value="paid">PAID</option>
+        <option value="delivered">DELIVERED</option><option value="cancelled">CANCELLED</option>
+      </select>
+      <button class="btn btn-acid no-print" id="update-order-btn">UPDATE STATUS</button>
+    </div>
+  </div>
+</div>
+
+<!-- User Detail -->
+<div class="overlay" id="modal-user">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-title">// AGENT FILE</div><button class="modal-x" data-close="modal-user">✕</button></div>
+    <div class="modal-body" id="user-detail-body"></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" data-close="modal-user">CLOSE</button>
+      <button class="btn btn-danger" id="ud-ban-btn"></button>
+      <button class="btn btn-acid" id="ud-role-btn"></button>
+    </div>
+  </div>
+</div>
+
+<!-- Ticket Detail -->
+<div class="overlay" id="modal-ticket">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-title">TICKET DETAIL</div><button class="modal-x" data-close="modal-ticket">✕</button></div>
+    <div class="modal-body" id="ticket-detail-body"></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" data-close="modal-ticket">CLOSE</button>
+      <button class="btn btn-danger" id="close-ticket-btn">CLOSE TICKET</button>
+      <button class="btn btn-acid" id="send-reply-btn">SEND REPLY</button>
+    </div>
+  </div>
+</div>
+
+<!-- Brand Rate -->
+<div class="overlay" id="modal-brand">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-hdr"><div class="modal-title">EDIT COMMISSION</div><button class="modal-x" data-close="modal-brand">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="brand-vendor-h"/>
+      <div class="form-group"><label class="form-lbl">BRAND</label><input class="form-ctrl" id="brand-name-disp" disabled/></div>
+      <div class="form-group"><label class="form-lbl">COMMISSION RATE (0.00 – 1.00)</label><input class="form-ctrl" type="number" step="0.01" min="0" max="1" id="brand-rate-in"/></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" data-close="modal-brand">CANCEL</button>
+      <button class="btn btn-acid" id="save-brand-btn">SAVE RATE</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="js/auth.js?v=3"></script>
+<script type="module" src="js/dashboard.js?v=3"></script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // =====================================================================
+    // HÀM KIỂM TRA QUYỀN CHUNG (REUSABLE FUNCTIONS)
+    // =====================================================================
+
+    // Kiểm tra user đã đăng nhập chưa
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Kiểm tra user hiện tại có phải là Admin không
+    // (Bằng cách lấy document của user đó trong collection 'users' và kiểm tra field 'role')
+    function isAdmin() {
+      return request.auth != null && 
+             (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' || 
+              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN');
+    }
+
+    // Kiểm tra user hiện tại có bị Banned không
+    function isNotBanned() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status != 'banned' &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status != 'BANNED';
+    }
+
+    // =====================================================================
+    // 1. BỘ SƯU TẬP USERS
+    // =====================================================================
+    match /users/{userId} {
+      // Bất kỳ user nào đăng nhập cũng có thể đọc thông tin user khác (cần thiết cho Signal Feed/Comments)
+      allow read: if isAuthenticated();
+
+      // User có thể tự tạo profile của mình khi đăng ký
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+
+      // UPDATE QUAN TRỌNG:
+      // User chỉ có thể update thông tin của CHÍNH MÌNH (userId == request.auth.uid).
+      // VÀ KHÔNG ĐƯỢC PHÉP thay đổi field "role" hoặc "status".
+      allow update: if (isAuthenticated() && request.auth.uid == userId
+                        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'status']))
+                    || isAdmin();
+
+      // Chỉ Admin mới được quyền xóa tài khoản (hoặc có thể chặn luôn không cho ai xóa)
+      allow delete: if isAdmin();
+    }
+
+    // =====================================================================
+    // 2. BỘ SƯU TẬP ARTIFACTS (THE VAULT - SẢN PHẨM)
+    // =====================================================================
+    match /artifacts/{artifactId} {
+      // Bất kỳ ai cũng có thể xem danh sách và chi tiết sản phẩm
+      allow read: if true;
+
+      // Admin toàn quyền thêm, xóa
+      allow create, delete: if isAdmin();
+
+      // Admin update toàn bộ. User thường chỉ được update stock (khi đặt hàng trừ tồn kho).
+      allow update: if isAdmin()
+                    || (isAuthenticated()
+                        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['stock', 'sizeStock']));
+    }
+
+    // =====================================================================
+    // 3. BỘ SƯU TẬP ORDERS (ĐƠN HÀNG)
+    // =====================================================================
+    match /orders/{orderId} {
+      // User chỉ được xem đơn hàng của chính mình. Admin xem được tất cả.
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
+
+      // User có thể tạo đơn hàng, với điều kiện userId trong đơn hàng phải đúng với uid của họ. KHÔNG BỊ BAN.
+      allow create: if isAuthenticated() && isNotBanned() && request.resource.data.userId == request.auth.uid;
+
+      // User KHÔNG được phép sửa đơn hàng (để tránh đổi trạng thái/giá tiền). Admin có thể sửa.
+      allow update: if isAdmin();
+      
+      allow delete: if isAdmin();
+    }
+
+    // =====================================================================
+    // 4. BỘ SƯU TẬP CONTACTS (TICKETS / HỖ TRỢ)
+    // =====================================================================
+    match /contacts/{contactId} {
+      // User xem ticket của mình. Admin xem tất cả.
+      allow read: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
+
+      // Bất kỳ user đăng nhập nào cũng tạo được ticket, MIỄN KHÔNG BỊ BAN
+      allow create: if isAuthenticated() && isNotBanned();
+
+      // Chỉ Admin mới được update (ví dụ: đổi status thành "resolved") hoặc delete.
+      allow update, delete: if isAdmin();
+    }
+
+    // =====================================================================
+    // 5. BỘ SƯU TẬP STATS & BRANDS & CLICKS (THỐNG KÊ COMMAND CENTER)
+    // =====================================================================
+    match /stats/{document=**} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /brands/{document=**} {
+      allow read: if isAuthenticated(); // Có thể để user đọc list brand
+      allow write: if isAdmin();
+    }
+
+    match /clicks/{clickId} {
+      allow read: if isAdmin();
+      allow create: if true; // Ai cũng có thể tạo log click
+      allow update, delete: if isAdmin();
+    }
+
+    // =====================================================================
+    // 6. BỘ SƯU TẬP THE SIGNAL (MẠNG XÃ HỘI)
+    // =====================================================================
+    match /signals/{postId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && isNotBanned() && request.resource.data.userId == request.auth.uid;
+      // Cho phép ai cũng được update (để Like, Comment) MIỄN KHÔNG BỊ BAN. Xóa thì chỉ chủ hoặc admin.
+      allow update: if isAuthenticated() && isNotBanned();
+      allow delete: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
+
+      match /comments/{commentId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated() && isNotBanned();
+        allow update: if isAuthenticated() && isNotBanned();
+        allow delete: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
+      }
+    }
+
+    // Mặc định khóa mọi thứ khác chưa được định nghĩa ở trên
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

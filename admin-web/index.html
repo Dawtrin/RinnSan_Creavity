@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RinnSan Creavity — Admin Login</title>
+  <meta name="description" content="Admin Command Center — RinnSan Creavity"/>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+<div class="login-page">
+  <div class="grid-bg"></div>
+  <div class="login-glow"></div>
+
+  <svg class="login-corner tl" width="160" height="160" viewBox="0 0 160 160">
+    <path d="M0 0 L70 0 L70 2 L2 2 L2 70 L0 70 Z" fill="#C0FF00"/>
+  </svg>
+  <svg class="login-corner br" width="160" height="160" viewBox="0 0 160 160">
+    <path d="M0 0 L70 0 L70 2 L2 2 L2 70 L0 70 Z" fill="#C0FF00"/>
+  </svg>
+
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="login-logo-box">RC</div>
+      <div>
+        <div class="login-brand-name">RinnSan</div>
+      </div>
+    </div>
+    <div class="login-tag">// ADMIN COMMAND CENTER //</div>
+
+    <form id="login-form" autocomplete="off">
+      <label class="login-label" for="email-in">EMAIL</label>
+      <input id="email-in" class="login-input" type="email" placeholder="admin@rinnsan.com" autocomplete="email" required/>
+
+      <label class="login-label" for="pass-in">PASSWORD</label>
+      <input id="pass-in" class="login-input" type="password" placeholder="••••••••••" autocomplete="current-password" required/>
+
+      <div id="login-err" class="login-error"></div>
+      <button id="login-btn" class="login-btn" type="submit">
+        <span id="btn-lbl">INITIALIZE ACCESS</span>
+      </button>
+    </form>
+
+    <div class="login-status">
+      <div class="status-dot"></div>
+      <div class="status-txt" id="status-txt">// AWAITING CREDENTIALS...</div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="js/auth.js?v=3"></script>
+</body>
+</html>

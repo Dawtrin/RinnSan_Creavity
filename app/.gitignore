@@ -1,0 +1,16 @@
+# Built artifacts
+/build
+
+# Gradle
+.gradle/
+gradle-wrapper.jar
+
+# Android Studio
+*.iml
+.idea/
+local.properties
+
+# Key files — KHÔNG BAO GIỜ commit các file này
+*.jks
+*.keystore
+google-services.json
