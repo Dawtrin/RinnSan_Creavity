@@ -14,5 +14,22 @@
 .cxx
 local.properties
 
+# Custom documentation and error log files
+app.docx
+build_errors.txt
+CONTEXT.md
+Demo shop.docx
+IMPLEMENTATION_PLAN.md
+location.md
+Mau bao caot.docx
+Mau_bao_caot.txt
+PRD.md
+PROJECT_OVERVIEW.md
+PROMPTS.md
+RULES.md
+TASKS.md
+VAULT_PLAN.md
+VIRTUAL_STYLIST_BOX.md
+
 
 
